@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vpro-mc-vs
+spec:
+  hosts:
+#  - vprocache01 
+   - vprocache01.vpro.svc.cluster.local 
+  tcp:
+  - route:
+    - destination:
+        host: vprocache01 
+        subset: vprocache-v1
+      weight: 50
+    - destination:
+        host: vprocache01 
+        subset: vprocache-v11
+      weight: 50
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: vpro-mc-dr
+spec:
+  host: vprocache01
+  trafficPolicy: ~ 
+  subsets:
+  - name: vprocache-v1
+    labels:
+      version: vpromc-v1
+  - name: vprocache-v11
+    labels:
+      version: vpromc-v11

@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myingress
+spec:
+  ingressClassName: nginx 
+  rules:
+  - host: "myapp.rx.com"
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: myapp
+            port:
+              number: 80
+  - host: "vproapp.rx.com"
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: vproapp-service-rx
+            port:
+              number: 80

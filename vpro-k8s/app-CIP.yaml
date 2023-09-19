@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vproapp-service
+spec:
+  ports:
+  - port: 80
+    targetPort: vproapp-port
+    protocol: TCP
+    nodePort: 30088
+  selector:
+    app: vproapp
+  type: NodePort
+
+

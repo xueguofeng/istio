@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vproapp-v11 # name of deployment
+  labels: 
+    app: vproapp-v11  # label of deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      version: vproapp-v11  # 
+  template:
+    metadata:
+      labels:
+        app: vproapp  # label of pod, for svc
+        version: vproapp-v11
+    spec:
+      containers:
+      - name: vproapp
+        image: richardxgf/vprofileapp:11
+        ports:
+        - name: vproapp-port
+          containerPort: 8080
+      initContainers:
+      - name: init-mydb
+        image: busybox
+        command: ['sh', '-c', 'until nslookup vprodb.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done;']
+      - name: init-memcache
+        image: busybox
+        command: ['sh', '-c', 'until nslookup vprocache01.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done;']

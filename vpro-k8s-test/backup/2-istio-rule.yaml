@@ -1,0 +1,93 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: vpro-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 8080
+      name: http
+      protocol: HTTP
+    hosts:
+    - "vproapp.rx.com"
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vpro-vs
+spec:
+  hosts:
+  - "vproapp.rx.com"
+  gateways:
+  - vpro-gateway
+  http:
+#  - match: # if has the header
+#    - headers:
+#        myheader:
+#          exact: canary
+#    route:
+#    - destination:
+#        host: vproapp-service 
+#        subset: vproapp-v11
+
+  - match:
+    - uri:
+        prefix: /
+    route: # catch all others
+    - destination:
+        host: vproapp-service 
+        subset: vproapp-v1
+---
+
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: vpro-dr
+spec:
+  host: vproapp-service
+  trafficPolicy: ~
+  subsets:
+  - name: vproapp-v1 # defaine a subset - v1
+    labels:
+      version: vproapp-v1
+  - name: vproapp-v11 # defaine a subset - v11
+    labels:
+      version: vproapp-v11
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vpro-mc-vs
+spec:
+  hosts:
+#  - vprocache01 
+   - vprocache01.vpro.svc.cluster.local 
+  tcp:
+  - route:
+    - destination:
+        host: vprocache01 
+        subset: vprocache-v1
+      weight: 10
+    - destination:
+        host: vprocache01 
+        subset: vprocache-v11
+      weight: 90
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: vpro-mc-dr
+spec:
+  host: vprocache01
+  trafficPolicy: ~ 
+  subsets:
+  - name: vprocache-v1
+    labels:
+      version: vpromc-v1
+  - name: vprocache-v11
+    labels:
+      version: vpromc-v11
