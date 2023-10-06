@@ -1,0 +1,47 @@
+upstream rxbe_nic {
+        server 192.168.70.171:30779; # K8S - Nginx Ingress Controller, only in the kworker1
+}
+
+upstream rxbe_iig {
+        server 192.168.70.172:30605; # K8S - Istio Ingress Gateway, all the 3 nodes can provide the access 
+}
+
+server {
+        listen 80;
+        server_name myapp.rx.com;
+        location / {
+            proxy_pass http://rxbe_nic; # k8S - Nginx Ingress Controller
+            proxy_set_header  Host  $host; 
+            # proxy_http_version 1.1;
+        }                        
+}
+
+server {
+	listen 80;
+        server_name demo.rx.com;
+	location / {
+            proxy_pass http://rxbe_iig;  # K8S - Istio Ingress Gateway    
+            proxy_set_header  Host  $host;   
+            proxy_http_version 1.1;        
+	} 
+}
+
+server {
+        listen 80;
+        server_name vpro.rx.com;
+        location / {
+            proxy_pass http://rxbe_iig;  # K8S - Istio Ingress Gateway
+            proxy_set_header  Host  $host;
+            proxy_http_version 1.1;
+        }
+}
+
+#server {
+#        listen 80;
+#        server_name kiali.rx.com;
+#        location / {
+#            proxy_pass http://rxbe_iig;  # K8S - Istio Ingress Gateway
+#            proxy_set_header  Host  $host;
+#            proxy_http_version 1.1;
+#        }
+#}
