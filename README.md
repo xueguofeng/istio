@@ -2,9 +2,9 @@
 
 ##### nodePort
 
-30080，myapp的nodePort - HTTP，3 nodes；
-30088，vpro的nodePort - HTTP，3 nodes；
-30779，Nginx Ingress Controller nodePort - HTTP，only kworker1；
+30080，myapp - HTTP，3 nodes；
+30088，vpro - HTTP，3 nodes；
+30779，Nginx Ingress Controller - HTTP，only kworker1；
 30605，Istio Ingress Gateway - HTTP，3 nodes；
 32228，Istio Ingress Gateway - HTTPS，3 nodes；
 30008，Dashboard - HTTPS，3 nodes；
